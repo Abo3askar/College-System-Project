@@ -18,6 +18,7 @@ struct students {
     string name, department, mobile_number, password;
     // for the easy access!
     grades student_grade[10];
+    int student_grades_count = 1;
 };
 // (ASM) for Academic_ Staff_member
 struct ASMs {
@@ -110,7 +111,7 @@ void save() {
             savefile << student[i].password << endl;
             savefile << student[i].Student_ID << endl;
             savefile << student[i].academic_year << endl;
-            for (int j = 0; j < 10; j++) {
+            for (int j = 0; j < student->student_grades_count; j++) {
                 savefile << student[i].student_grade[j].course_name << endl;
                 savefile << student[i].student_grade[j].final << endl;
                 savefile << student[i].student_grade[j].practical << endl;

@@ -1,0 +1,14 @@
+CMS_DATABASE_V1
+1 0 0 0 0 0 0 
+Omar Gamal
+Computer science
+0123123213
+aswerwa
+31321
+1
+discrete math
+45
+17
+10
+5
+77
