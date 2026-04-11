@@ -84,7 +84,7 @@ void save() {
     // we want to save the data from structs for every type we have
     // students, staff members, admins, student_grades, courses, appointment, exam schedules, course_schedule
     // students and their grades
-    ofstream savefile("students.txt");
+    ofstream savefile("data.txt")     
     while (savefile.is_open()) {
         for (int i = 0; i < studentcount; i++) {
             savefile << student[i].Student_ID << endl;
