@@ -11,7 +11,7 @@ using namespace std;
 
 struct grades {
     string course_name;
-    float final, practical, year_work, quiz;
+    float final, practical, year_work, quiz, grade_sum;
 };
 struct students {
     int Student_ID, academic_year;
@@ -53,9 +53,9 @@ struct courses_schedule {
 
 // Preparing ram data 
 students student[Students_max_users];
-int studentcount(0);
+int studentcount(1);
 ASMs  academic_member[Doctors_max_users];
-int  staffcout(0);
+int  staffcount(0);
 Admins admin_member[Administrators_max_users];
 int adminscount(0);
 courses course[Courses_limit];
@@ -65,7 +65,7 @@ int examscount(0);
 courses_schedule courses_table[Courses_limit];
 int schedules_count(0);
 appointments appointment[200];
-int appointment_cout(0);
+int appointment_count(0);
 // Please define the functions here
 bool login(int type, string username, string password);
 bool signup(int type, string username, string password);
@@ -76,7 +76,22 @@ void save();
 void load();
 // Save & Load functions
 int main() {
+    load();
+    student[0].name = "Omar Gamal";
+    student[0].department = "Computer science";
+    student[0].mobile_number = "0123123213";
+    student[0].password = "aswerwa";
+    student[0].Student_ID = 31321;
+    student[0].academic_year = 1;
+    student[0].student_grade[0].course_name = "discrete math";
+    student[0].student_grade[0].final = 45;
+    student[0].student_grade[0].practical = 17;
+    student[0].student_grade[0].year_work = 10;
+    student[0].student_grade[0].quiz = 5;
+    student[0].student_grade[0].grade_sum = 77;
+    cout << "Hi iam testing (:\n";
 
+    save();
     return 0;
 }
 // don't forget to declare them (:
@@ -84,75 +99,79 @@ void save() {
     // we want to save the data from structs for every type we have
     // students, staff members, admins, student_grades, courses, appointment, exam schedules, course_schedule
     // students and their grades
-    ofstream savefile("data.txt")     
-    while (savefile.is_open()) {
+    ofstream savefile("data.txt");
+    if (savefile.is_open()) {
+        savefile << "CMS_DATABASE_V1" << endl;
+        savefile << studentcount << " " << staffcount << " " << adminscount << " " << coursescount << " " << examscount << " " << schedules_count << " " << appointment_count << " " << endl;
         for (int i = 0; i < studentcount; i++) {
-            savefile << student[i].Student_ID << endl;
-            savefile << student[i].academic_year << endl;
             savefile << student[i].name << endl;
             savefile << student[i].department << endl;
             savefile << student[i].mobile_number << endl;
             savefile << student[i].password << endl;
-        for (int j = 0; j < 10; j++) {
-            savefile << student[i].student_grade[j].course_name;
-            savefile << student[i].student_grade[j].final;
-            savefile << student[i].student_grade[j].practical;
-            savefile << student[i].student_grade[j].quiz;
-            savefile << student[i].student_grade[j].year_work;
+            savefile << student[i].Student_ID << endl;
+            savefile << student[i].academic_year << endl;
+            for (int j = 0; j < 10; j++) {
+                savefile << student[i].student_grade[j].course_name << endl;
+                savefile << student[i].student_grade[j].final << endl;
+                savefile << student[i].student_grade[j].practical << endl;
+                savefile << student[i].student_grade[j].year_work << endl;
+                savefile << student[i].student_grade[j].quiz << endl;
+                savefile << student[i].student_grade[j].grade_sum << endl;
+            }
         }
+        // staff members
+        for (int i = 0; i < staffcount; i++) {
+            for (int j = 0; j < 5; j++) {
+                savefile << academic_member[i].teaching_courses[j] << endl;
+            }
+            savefile << academic_member[i].name << endl;
+            savefile << academic_member[i].password << endl;
+            savefile << academic_member[i].mobile_number << endl;
+            savefile << academic_member[i].department << endl;
+            savefile << academic_member[i].position << endl;
+            savefile << academic_member[i].staff_member_ID << endl;
         }
-         // staff members
-        for (int i = 0; i < staffcout; i++) {
-            savefile << academic_member[i].name;
-            savefile << academic_member[i].staff_member_ID;
-            savefile << academic_member[i].password;
-            savefile << academic_member[i].mobile_number;
-            savefile << academic_member[i].department;
-            savefile << academic_member[i].position;
-            savefile << academic_member[i].teaching_courses;
-        }
-         // staff members
-        // admins
+        // staff members
+       // admins
         for (int i = 0; i < adminscount; i++) {
-            savefile << admin_member[i].name;
-            savefile << admin_member[i].ID;
-            savefile << admin_member[i].name;
-            savefile << admin_member[i].password;
-            savefile << admin_member[i].mobile_number;
-            savefile << admin_member[i].position;
+            savefile << admin_member[i].name << endl;
+            savefile << admin_member[i].password << endl;
+            savefile << admin_member[i].mobile_number << endl;
+            savefile << admin_member[i].position << endl;
+            savefile << admin_member[i].ID << endl;
         }
 
         // admins
         // courses
         for (int i = 0; i < coursescount; i++) {
-            savefile << course[i].name;
-            savefile << course[i].academic_member_name;
-            savefile << course[i].grade;
+            savefile << course[i].name << endl;
+            savefile << course[i].academic_member_name << endl;
+            savefile << course[i].grade << endl;
         }
 
         //courses
         // appointments
-        for (int i = 0; i < appointment_cout; i++) {
-            savefile << appointment[i].student_id;
-            savefile << appointment[i].staff_id;
-            savefile << appointment[i].date;
-            savefile << appointment[i].time;
+        for (int i = 0; i < appointment_count; i++) {
+            savefile << appointment[i].date << endl;
+            savefile << appointment[i].time << endl;
+            savefile << appointment[i].student_id << endl;
+            savefile << appointment[i].staff_id << endl;
         }
 
 
         // appointments
         // exam schedules
         for (int i = 0; i < examscount; i++) {
-            savefile << exam_schedule[i].exam_name;
-            savefile << exam_schedule[i].date;
-            savefile << exam_schedule[i].time;
+            savefile << exam_schedule[i].exam_name << endl;
+            savefile << exam_schedule[i].date << endl;
+            savefile << exam_schedule[i].time << endl;
         }
         // exam schedules
         // courses_schedule
         for (int i = 0; i < schedules_count; i++) {
-            savefile << courses_table[i].course_name;
-            savefile << courses_table[i].week_day;
-            savefile << courses_table[i].time;
+            savefile << courses_table[i].course_name << endl;
+            savefile << courses_table[i].week_day << endl;
+            savefile << courses_table[i].time << endl;
         }
 
         //courses_schedule
@@ -162,7 +181,15 @@ void save() {
 // load function declaration
 void load() {
     ifstream loadfile("data.txt");
-    while (loadfile.is_open()) {
+    if (loadfile.is_open()) {
+        string header;
+        getline(loadfile, header);
+        if (header != "CMS_DATABASE_V1") {
+            cout << "Error: File corrupted or incompatible!" << endl;
+            return;
+            }
+
+        loadfile >> studentcount >> staffcount >> adminscount >> coursescount >> examscount >> schedules_count >> appointment_count;
         for (int i = 0; i < studentcount; i++) {
             getline(loadfile >> ws, student[i].name);
             getline(loadfile >> ws, student[i].department);
@@ -176,10 +203,11 @@ void load() {
                 loadfile >> student[i].student_grade[j].practical;
                 loadfile >> student[i].student_grade[j].quiz;
                 loadfile >> student[i].student_grade[j].year_work;
+                loadfile >> student[i].student_grade[j].grade_sum;
             }
         }
         // staff members
-        for (int i = 0; i < staffcout; i++) {
+        for (int i = 0; i < staffcount; i++) {
             for (int j = 0; j < 5; j++) {
                 getline(loadfile >> ws, academic_member[i].teaching_courses[j]);
             }
@@ -210,7 +238,7 @@ void load() {
 
         //courses
         // appointments
-        for (int i = 0; i < appointment_cout; i++) {
+        for (int i = 0; i < appointment_count; i++) {
             getline(loadfile >> ws, appointment[i].date);
             getline(loadfile >> ws, appointment[i].time);
             loadfile >> appointment[i].student_id;
@@ -221,9 +249,9 @@ void load() {
         // appointments
         // exam schedules
         for (int i = 0; i < examscount; i++) {
-            getline(loadfile >> ws,exam_schedule[i].exam_name);
-            getline(loadfile >> ws,exam_schedule[i].date);
-            getline(loadfile >> ws,exam_schedule[i].time);
+            getline(loadfile >> ws, exam_schedule[i].exam_name);
+            getline(loadfile >> ws, exam_schedule[i].date);
+            getline(loadfile >> ws, exam_schedule[i].time);
         }
         // exam schedules
         // courses_schedule
