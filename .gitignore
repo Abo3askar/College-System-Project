@@ -1,1 +1,20 @@
+# Visual Studio ملفات تخص بيئة العمل
 .vs/
+*.user
+*.userosscache
+*.sln.docstates
+
+# Build Results ملفات نواتج التشغيل (مهمة جداً)
+[Debug]/
+[Release]/
+x64/
+x86/
+[Dd]ebug/
+[Rr]elease/
+
+# ملفات الـ Compiled والـ Executables
+*.obj
+*.exe
+*.pdb
+*.ilk
+*.log
