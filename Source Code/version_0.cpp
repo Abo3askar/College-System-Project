@@ -67,9 +67,13 @@ courses_schedule courses_table[Courses_limit];
 int schedules_count(0);
 appointments appointment[200];
 int appointment_count(0);
-// Please define the functions here
-bool login(int type, string username, string password);
-bool signup(int type, string username, string password);
+// Please declare the functions here
+
+bool logincheck(string username, string password, int usertype);
+bool signupcheck(string username, string password, int usertype);
+void studentmeneu();
+void staffmeneu();
+void adminsmeneu();
 
 
 // Save & Load functions (type them down)
@@ -78,20 +82,31 @@ void load();
 // Save & Load functions
 int main() {
     load();
-    student[0].name = "Omar Gamal";
-    student[0].department = "Computer science";
-    student[0].mobile_number = "0123123213";
-    student[0].password = "aswerwa";
-    student[0].Student_ID = 31321;
-    student[0].academic_year = 1;
-    student[0].student_grade[0].course_name = "discrete math";
-    student[0].student_grade[0].final = 45;
-    student[0].student_grade[0].practical = 17;
-    student[0].student_grade[0].year_work = 10;
-    student[0].student_grade[0].quiz = 5;
-    student[0].student_grade[0].grade_sum = 77;
-    cout << "Hi iam testing (:\n";
+    char choice;
+    cout << "=================================\n";
+    cout << "Welcome to the college management system\n";
+    cout << "=================================\n";
+    cout << "press 1: if you are a student\n";
+    cout << "press 2: if you are a staff member\n";
+    cout << "press 3: if you are an admin\n";
+    cout << "press 4: Save & Exit\n";
+    cin >> choice;
+    switch (choice) {
+    case '1':
 
+        break;
+    case '2':
+
+        break;
+    case '3':
+
+        break;
+    case '4':
+
+        break;
+    default:
+        cout << "Sorry Invalid Option! " << endl;
+    }
     save();
     return 0;
 }
@@ -133,7 +148,7 @@ void save() {
             savefile << academic_member[i].staff_member_ID << endl;
         }
         // staff members
-       // admins
+        // admins
         for (int i = 0; i < adminscount; i++) {
             savefile << admin_member[i].name << endl;
             savefile << admin_member[i].password << endl;
@@ -188,7 +203,7 @@ void load() {
         if (header != "CMS_DATABASE_V1") {
             cout << "Error: File corrupted or incompatible!" << endl;
             return;
-            }
+        }
 
         loadfile >> studentcount >> staffcount >> adminscount >> coursescount >> examscount >> schedules_count >> appointment_count;
         for (int i = 0; i < studentcount; i++) {
@@ -264,5 +279,45 @@ void load() {
 
         //courses_schedule
     }
-    loadfile.close();
+        loadfile.close();
 }
+    bool logincheck(string username, string password, int usertype){
+        if (usertype == 1) {
+            for (int i = 0; i < studentcount; i++) {
+                if (username == student[i].name && password == student[i].password) {
+                    return true;
+                }
+            }
+        }
+        if (usertype == 2) {
+            for (int i = 0; i < staffcount; i++) {
+                if (username == academic_member[i].name && password == academic_member[i].password) {
+                    return true;
+                }
+            }
+        }
+        if (usertype == 3) {
+            for (int i = 0; i < adminscount; i++) {
+                if (username == admin_member[i].name && password == admin_member[i].password) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+    bool signupcheck(string username, string password, int usertype) {
+
+        return false;
+    }
+    void studentmeneu() {
+
+
+    }
+    void staffmeneu() {
+
+
+    }
+    void adminsmeneu() {
+
+
+    }
