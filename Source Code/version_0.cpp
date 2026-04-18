@@ -17,8 +17,8 @@ struct students {
     int Student_ID, academic_year;
     string name, department, mobile_number, password;
     // for the easy access!
-    grades student_grade[10];
-    int student_grades_count = 1;
+    grades student_grade[7];
+    int student_grades_count = 0;
 };
 // (ASM) for Academic_ Staff_member
 struct ASMs {
@@ -54,7 +54,7 @@ struct courses_schedule {
 
 // Preparing ram data 
 students student[Students_max_users];
-int studentcount(1);
+int studentcount(0);
 ASMs  academic_member[Doctors_max_users];
 int  staffcount(0);
 Admins admin_member[Administrators_max_users];
@@ -71,9 +71,9 @@ int appointment_count(0);
 
 bool logincheck(string username, string password, int usertype);
 bool signupcheck(string username, string password, int usertype);
-void studentmeneu();
-void staffmeneu();
-void adminsmeneu();
+void studentmenu(string username, string password);
+void staffmenu();
+void adminsmenu();
 
 
 // Save & Load functions (type them down)
@@ -82,31 +82,86 @@ void load();
 // Save & Load functions
 int main() {
     load();
-    char choice;
-    cout << "=================================\n";
-    cout << "Welcome to the college management system\n";
-    cout << "=================================\n";
-    cout << "press 1: if you are a student\n";
-    cout << "press 2: if you are a staff member\n";
-    cout << "press 3: if you are an admin\n";
-    cout << "press 4: Save & Exit\n";
-    cin >> choice;
-    switch (choice) {
-    case '1':
+        char choice;
+    do {
+        system("cls");
+        cout << "=================================\n";
+        cout << "Welcome to the college management system\n";
+        cout << "=================================\n";
+        cout << "press 1: To Sign Up\n";
+        cout << "press 2: To Login As a Student\n";
+        cout << "press 3: To Login As a Staff member\n";
+        cout << "press 4: To Login As an Admin\n";
+        cout << "press 5: Save & Exit\n";
+        cin >> choice;
 
-        break;
-    case '2':
+        switch (choice) {
+        case '1': {
+            string signup_username, signup_pass;
+            int type;
+            cout << "Sign up as (1: Student, 2: Staff, 3: Admin): ";
+            cin >> type;
+            cout << "Enter new username: ";
+            cin >> signup_username;
+            cout << "Enter new password: ";
+            cin >> signup_pass;
 
-        break;
-    case '3':
-
-        break;
-    case '4':
-
-        break;
-    default:
-        cout << "Sorry Invalid Option! " << endl;
-    }
+            if (signupcheck(signup_username, signup_pass, type)) {
+                cout << "Account created successfully! You can now login.\n";
+                system("pause");
+            }
+            }
+                break;
+        case '2': {
+            string user, pass;
+            cout << "\n--- Student Login ---\n";
+            cout << "Enter Username (or type '0' to go back): ";
+            cin >> user;
+            if (user == "0")
+                break;
+            cout << "Enter Password: ";
+            cin >> pass;
+            if (logincheck(user, pass, 1)) {
+                studentmenu(user, pass);
+            }
+        }
+            break;
+        case '3': {
+            string user, pass;
+            cout << "\n--- Staff Login ---\n";
+            cout << "Enter Username (or type '0' to go back): ";
+            cin >> user;
+            if (user == "0")
+                break;
+             cout << "Enter Password: ";
+             cin >> pass;
+                if (logincheck(user, pass, 2)) {
+                    studentmenu(user, pass);
+                }
+            }
+            break;
+        case '4':{
+            string user, pass;
+            cout << "\n--- Admin Login ---\n";
+            cout << "Enter Username (or type '0' to go back): ";
+            cout << "Enter Username: ";
+            cin >> user;
+            if (user == "0")
+                break;
+            cout << "Enter Password: ";
+            cin >> pass;
+              if (logincheck(user, pass, 3)) {
+                    studentmenu(user, pass);
+                }
+        }
+            break;
+        case '5':
+            cout << "Saving data and exiting...\n";
+            break;
+        default:
+            cout << "Sorry Invalid Option! " << endl;
+        }
+    } while(choice != '5');
     save();
     return 0;
 }
@@ -126,7 +181,8 @@ void save() {
             savefile << student[i].password << endl;
             savefile << student[i].Student_ID << endl;
             savefile << student[i].academic_year << endl;
-            for (int j = 0; j < student->student_grades_count; j++) {
+            savefile << student[i].student_grades_count << endl;
+            for (int j = 0; j < student[i].student_grades_count; j++) {
                 savefile << student[i].student_grade[j].course_name << endl;
                 savefile << student[i].student_grade[j].final << endl;
                 savefile << student[i].student_grade[j].practical << endl;
@@ -213,7 +269,8 @@ void load() {
             getline(loadfile >> ws, student[i].password);
             loadfile >> student[i].Student_ID;
             loadfile >> student[i].academic_year;
-            for (int j = 0; j < 10; j++) {
+            loadfile >> student[i].student_grades_count;
+            for (int j = 0; j < student[i].student_grades_count; j++) {
                 getline(loadfile >> ws, student[i].student_grade[j].course_name);
                 loadfile >> student[i].student_grade[j].final;
                 loadfile >> student[i].student_grade[j].practical;
@@ -282,6 +339,7 @@ void load() {
         loadfile.close();
 }
     bool logincheck(string username, string password, int usertype){
+
         if (usertype == 1) {
             for (int i = 0; i < studentcount; i++) {
                 if (username == student[i].name && password == student[i].password) {
@@ -291,7 +349,7 @@ void load() {
         }
         if (usertype == 2) {
             for (int i = 0; i < staffcount; i++) {
-                if (username == academic_member[i].name && password == academic_member[i].password) {
+                if (username == academic_member[i].name && password == academic_member[i].password) {   
                     return true;
                 }
             }
@@ -309,15 +367,64 @@ void load() {
 
         return false;
     }
-    void studentmeneu() {
+    void studentmenu(string username, string passwword) {
+        int studentIndex = -1;
+        for (int i = 0; i < studentcount; i++) {
+            if (student[i].name == username) {
+                studentIndex = i;
+                break;
+            }
+        }
+        char student_choice;
+        do {
+            cout << "\n=================================\n";
+            cout << "       Welcome " << username << "!\n";
+            cout << "       Student Dashboard\n";
+            cout << "=================================\n";
+            cout << "Press 1 To Register Courses\n";
+            cout << "Press 2 To See Your Grades\n";
+            cout << "Press 3 To Request An Appointment With An Academic Staff\n";
+            cout << "Press 4 To Logout (Return to Main Menu)\n";
+            cout << "Enter your choice: ";
+            cin >> student_choice;
+            switch (student_choice) {
+            case '1': {
+                cout << "====Available Courses====\n";
+                for (int i = 0; i < coursescount; i++) {
+                    cout << i + 1 << ". " << course[i].name << " (Staff: " << course[i].academic_member_name << ")\n";
+                }
+                int course_choice;
+                cout << "Select course number to register: ";
+                cin >> course_choice;
+                if (course_choice > 0 && course_choice <= coursescount) {
+                    int current_course = student[studentIndex].student_grades_count;
+                    if (current_course < 7) {
+                        student[studentIndex].student_grade[current_course].course_name = course[student_choice - 1].name;
+                        student[studentIndex].student_grades_count++;
+                        cout << "Successfully registered in " << course[student_choice - 1].name << endl;
+                    }
+                    else
+                    {
+                        cout << "You reached the maximum limit of courses!\n";
+                    }
+                }
+                system("pause");
+                break;
+            }
+            case '2': {
+
+            }
+            case '3': {
+
+            }
+            }
 
 
+        } while (student_choice != '4');
     }
-    void staffmeneu() {
-
-
+    void staffmenu() {
+        
     }
-    void adminsmeneu() {
-
-
+    void adminsmenu() {
+        
     }
