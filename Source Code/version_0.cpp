@@ -2,6 +2,7 @@
 #include<string>
 #include<iomanip>
 #include<fstream>
+//#include<algorithm>
 // defining the max inputs for our system
 #define Students_max_users 500
 #define Doctors_max_users 100
@@ -10,8 +11,14 @@
 using namespace std;
 
 struct grades {
-    string course_name;
-    float final, practical, year_work, quiz, grade_sum;
+    string course_name, gpa_alphabet;
+    float final, practical, year_work, quiz, gpa;
+};
+struct appointments {
+    int student_id;
+    int staff_id;
+    string date;
+    string time;
 };
 struct students {
     int Student_ID, academic_year;
@@ -19,11 +26,15 @@ struct students {
     // for the easy access!
     grades student_grade[7];
     int student_grades_count = 0;
+    appointments student_side[5];
+    int student_appointment_side_count = 0;
 };
 // (ASM) for Academic_ Staff_member
 struct ASMs {
     int staff_member_ID, academic_year;
     string name, mobile_number, department, position, password, teaching_courses[5];
+    appointments staff_side[25];
+    int staff_appointment_side_count = 0;
 };
 // (Admin) for administration_member
 struct Admins {
@@ -35,12 +46,6 @@ struct courses {
     string name, academic_member_name;
 };
 // if the student want to meet a staff member
-struct appointments {
-    int student_id;
-    int staff_id;
-    string date;
-    string time;
-};
 struct exams_schedule {
     string exam_name;
     string date;
@@ -70,7 +75,7 @@ int appointment_count(0);
 // Please declare the functions here
 
 bool logincheck(string username, string password, int usertype);
-bool signupcheck(string username, string password, int usertype);
+bool signupcheck(string username, string password, char usertype);
 void studentmenu(string username, string password);
 void staffmenu();
 void adminsmenu();
@@ -98,7 +103,7 @@ int main() {
         switch (choice) {
         case '1': {
             string signup_username, signup_pass;
-            int type;
+            char type;
             cout << "Sign up as (1: Student, 2: Staff, 3: Admin): ";
             cin >> type;
             cout << "Enter new username: ";
@@ -160,6 +165,7 @@ int main() {
             break;
         default:
             cout << "Sorry Invalid Option! " << endl;
+            break;
         }
     } while(choice != '5');
     save();
@@ -184,11 +190,12 @@ void save() {
             savefile << student[i].student_grades_count << endl;
             for (int j = 0; j < student[i].student_grades_count; j++) {
                 savefile << student[i].student_grade[j].course_name << endl;
+                savefile << student[i].student_grade[j].gpa_alphabet << endl;
                 savefile << student[i].student_grade[j].final << endl;
                 savefile << student[i].student_grade[j].practical << endl;
                 savefile << student[i].student_grade[j].year_work << endl;
                 savefile << student[i].student_grade[j].quiz << endl;
-                savefile << student[i].student_grade[j].grade_sum << endl;
+                savefile << student[i].student_grade[j].gpa << endl;
             }
         }
         // staff members
@@ -272,11 +279,12 @@ void load() {
             loadfile >> student[i].student_grades_count;
             for (int j = 0; j < student[i].student_grades_count; j++) {
                 getline(loadfile >> ws, student[i].student_grade[j].course_name);
+                getline(loadfile >> ws, student[i].student_grade[j].gpa_alphabet);
                 loadfile >> student[i].student_grade[j].final;
                 loadfile >> student[i].student_grade[j].practical;
                 loadfile >> student[i].student_grade[j].quiz;
                 loadfile >> student[i].student_grade[j].year_work;
-                loadfile >> student[i].student_grade[j].grade_sum;
+                loadfile >> student[i].student_grade[j].gpa;
             }
         }
         // staff members
@@ -363,8 +371,59 @@ void load() {
         }
         return false;
     }
-    bool signupcheck(string username, string password, int usertype) {
-
+    bool signupcheck(string username, string password, char usertype) {
+        if (usertype == '1') {
+            for (int i = 0; i < studentcount; i++) {
+                if (username == student[i].name) {
+                    cout << "*********Sorry this username is already used!*********";
+                    system("pause");
+                    return false;
+                }
+            }
+                studentcount++;
+                student[studentcount - 1].name = username;
+                student[studentcount - 1].password = password;
+                student[studentcount - 1].Student_ID = 1882202611 + studentcount;
+                cout << "===========Your student account has created seccessfully===========\n";
+                cout << "Your student ID is: " << student[studentcount - 1].Student_ID;
+                save();
+                system("pause");
+                return true;
+        }
+        if (usertype == '2') {
+            for (int i = 0; i < studentcount; i++) {
+                if (username == student[i].name) {
+                    cout << "*********Sorry this username is already used!*********";
+                    break;
+                }
+            }
+            staffcount++;
+            academic_member[staffcount - 1].name = username;
+            academic_member[staffcount - 1].password = password;
+            academic_member[staffcount - 1].staff_member_ID = 1882202622 + staffcount;
+            cout << "===========Your academic account has created seccessfully===========\n";
+            cout << "Your academic_member ID is: " << academic_member[staffcount - 1].staff_member_ID;
+            save();
+            return true;
+            system("pause");
+        }
+        if (usertype == '3') {
+            for (int i = 0; i < studentcount; i++) {
+                if (username == student[i].name) {
+                    cout << "*********Sorry this username is already used!*********";
+                    break;
+                }
+            }
+            studentcount++;
+            student[studentcount - 1].name = username;
+            student[studentcount - 1].password = password;
+            student[studentcount - 1].Student_ID = 1882202611 + studentcount;
+            cout << "===========Your admin account has created seccessfully===========\n";
+            cout << "Your student ID is: " << student[studentcount - 1].Student_ID;
+            save();
+            return true;
+            system("pause");
+        }
         return false;
     }
     void studentmenu(string username, string passwword) {
@@ -399,9 +458,9 @@ void load() {
                 if (course_choice > 0 && course_choice <= coursescount) {
                     int current_course = student[studentIndex].student_grades_count;
                     if (current_course < 7) {
-                        student[studentIndex].student_grade[current_course].course_name = course[student_choice - 1].name;
+                        student[studentIndex].student_grade[current_course].course_name = course[course_choice - 1].name;
                         student[studentIndex].student_grades_count++;
-                        cout << "Successfully registered in " << course[student_choice - 1].name << endl;
+                        cout << "Successfully registered in " << course[course_choice - 1].name << endl;
                     }
                     else
                     {
@@ -412,19 +471,136 @@ void load() {
                 break;
             }
             case '2': {
-
+                for (int i = 0; i < student[studentIndex].student_grades_count; i++) {
+                    cout << "=====================================\n";
+                    cout << student[studentIndex].student_grade[i].course_name << ": \n";
+                    cout << "quiz: " << student[studentIndex].student_grade[i].quiz << endl;
+                    cout << "Year work: " << student[studentIndex].student_grade[i].year_work << endl;
+                    cout << "Final: " << student[studentIndex].student_grade[i].final << endl;
+                    cout << "GPA: " << student[studentIndex].student_grade[i].gpa << endl;
+                    cout << "gpa_alphabet: " << student[studentIndex].student_grade[i].gpa_alphabet << endl;
+                    cout << "=====================================\n";
+                }
+                system("pause");
+                break;
             }
             case '3': {
-
+                // appointment
+                cout << "1 To show your appointments: \n";
+                cout << "2 To register an appointment: \n";
+                char app_choice;
+                cin >> app_choice;
+                switch (app_choice) {
+                case '1': {
+                    for (int i = 0; i < student[studentIndex].student_appointment_side_count; i++) {
+                        cout << student[studentIndex].student_side[i].staff_id << endl;
+                        cout << student[studentIndex].student_side[i].date << endl;
+                        cout << student[studentIndex].student_side[i].time << endl;
+                    }
+                    break;
+                }
+                case '2': {
+                    cout << "Please choose the staff member to meet with (*Type the name*): ";
+                    for (int i = 0; i < staffcount; i++) {
+                        cout << academic_member[i].name << endl;
+                    }
+                    string member_to_meet;
+                    int app_date_year, app_date_month, app_date_day, app_time;
+                    cin >> member_to_meet;
+                    int staff_index;
+                    for (int i = 0; i < staffcount; i++) {
+                        if (member_to_meet == academic_member[i].name) {
+                            staff_index = i;
+                        }
+                    }
+                    for (int i = 0; i < staffcount; i++) {
+                        if (member_to_meet == academic_member[i].name) {
+                            cout << "Choose the date please: ";
+                            cout << "Year: ";
+                            cin >> app_date_year;
+                            cout << "month: ";
+                            cin >> app_date_month;
+                            cout << "day: ";
+                            cin >> app_date_day;
+                            student[studentIndex].student_side[student[studentIndex].student_appointment_side_count - 1].date =
+                                to_string(app_date_year) + "-" + to_string(app_date_month) + "-" + to_string(app_date_day);
+                            academic_member[staff_index].staff_side[academic_member[staff_index].staff_appointment_side_count - 1].date =
+                                to_string(app_date_year) + "-" + to_string(app_date_month) + "-" + to_string(app_date_day);
+                            cout << "Choose the time please (from 8 to 16): ";
+                            cin >> app_time;
+                            student[studentIndex].student_side[student[studentIndex].student_appointment_side_count - 1].time = to_string(app_time);
+                            academic_member[staff_index].staff_side[academic_member[staff_index].staff_appointment_side_count - 1].time = to_string(app_time);
+                            appointment[appointment_count - 1].student_id = student[studentIndex].Student_ID;
+                            appointment[appointment_count - 1].staff_id = academic_member[staff_index].staff_member_ID;
+                            appointment_count++;
+                            cout << "The appointment registered successfully \n";
+                            system("pause");
+                        }
+                    }
+                        break;
+                }
+                }
             }
             }
 
 
         } while (student_choice != '4');
     }
-    void staffmenu() {
-        
+    void staffmenu(string username, string passwword) {
+        char staff_choice;
+        int stafff_logged_index;
+        for (int i = 0; i < staffcount; i++) {
+            if (academic_member[i].name == username) {
+                stafff_logged_index = i;
+                break;
+            }
+        }
+        do {
+            cout << "\n=================================\n";
+            cout << "       Welcome " << username << "!\n";
+            cout << "       Academic members' Dashboard\n";
+            cout << "=================================\n";
+            cout << "Press 1 To set grades\n";
+            cout << "Press 2 To select the academic courses to teach\n";
+            cout << "Press 3 To Logout (Return to Main Menu)\n";
+            cout << "Enter your choice: ";
+            cin >> staff_choice;
+            switch (staff_choice) {
+            case '1': {
+
+                break;
+            }
+            case '2': {
+
+                break;
+            }
+            }
+
+        } while (staff_choice != 3);
     }
-    void adminsmenu() {
-        
+
+    void adminsmenu(string username, string password) {
+        int Admin_index;
+        char Admin_choice;
+        for (int i = 0; i < adminscount; i++) {
+            if (admin_member[i].name == username) {
+                Admin_index = i;
+                break;
+            }
+        }
+
+        do {
+            cout << "\n=================================\n";
+            cout << "       Welcome " << username << "!\n";
+            cout << "       Admins' Dashboard\n";
+            cout << "=================================\n";
+            cout << "Press 1 To Add Courses\n";
+            cout << "Press 2 To Put Schedules Of Courses\n";
+            cout << "Press 3 To Put Schedules Of Exams\n";
+            cout << "Press 4 To Logout (Return to Main Menu)\n";
+            cout << "Enter your choice: ";
+
+
+            switch (Admin_choice)
+        } while (Admin_choice != 4);
     }

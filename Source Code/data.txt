@@ -1,14 +1,9 @@
 CMS_DATABASE_V1
 1 0 0 0 0 0 0 
-Omar Gamal
-Computer science
-0123123213
-aswerwa
-31321
-1
-discrete math
-45
-17
-5
-10
-77
+thorofin
+
+
+123
+1882202612
+0
+0
