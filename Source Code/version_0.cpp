@@ -2,6 +2,8 @@
 #include<string>
 #include<iomanip>
 #include<fstream>
+#include<algorithm>
+#include<cctype>
 //#include<algorithm>
 // defining the max inputs for our system
 #define Students_max_users 500
@@ -77,8 +79,8 @@ int appointment_count(0);
 bool logincheck(string username, string password, int usertype);
 bool signupcheck(string username, string password, char usertype);
 void studentmenu(string username, string password);
-void staffmenu();
-void adminsmenu();
+void staffmenu(string username, string password);
+void adminsmenu(string username, string password);
 
 
 // Save & Load functions (type them down)
@@ -133,7 +135,7 @@ int main() {
             break;
         case '3': {
             string user, pass;
-            cout << "\n--- Staff Login ---\n";
+            cout << "\n--- staff' Login ---\n";
             cout << "Enter Username (or type '0' to go back): ";
             cin >> user;
             if (user == "0")
@@ -141,13 +143,13 @@ int main() {
              cout << "Enter Password: ";
              cin >> pass;
                 if (logincheck(user, pass, 2)) {
-                    studentmenu(user, pass);
+                    staffmenu(user, pass);
                 }
             }
             break;
         case '4':{
             string user, pass;
-            cout << "\n--- Admin Login ---\n";
+            cout << "\n--- Admins' Login ---\n";
             cout << "Enter Username (or type '0' to go back): ";
             cout << "Enter Username: ";
             cin >> user;
@@ -156,7 +158,7 @@ int main() {
             cout << "Enter Password: ";
             cin >> pass;
               if (logincheck(user, pass, 3)) {
-                    studentmenu(user, pass);
+                    adminsmenu(user, pass);
                 }
         }
             break;
@@ -385,7 +387,7 @@ void load() {
                 student[studentcount - 1].password = password;
                 student[studentcount - 1].Student_ID = 1882202611 + studentcount;
                 cout << "===========Your student account has created seccessfully===========\n";
-                cout << "Your student ID is: " << student[studentcount - 1].Student_ID;
+                cout << "Your student ID is: " << student[studentcount - 1].Student_ID << endl;
                 save();
                 system("pause");
                 return true;
@@ -402,24 +404,24 @@ void load() {
             academic_member[staffcount - 1].password = password;
             academic_member[staffcount - 1].staff_member_ID = 1882202622 + staffcount;
             cout << "===========Your academic account has created seccessfully===========\n";
-            cout << "Your academic_member ID is: " << academic_member[staffcount - 1].staff_member_ID;
+            cout << "Your academic_member ID is: " << academic_member[staffcount - 1].staff_member_ID << endl;
             save();
             return true;
             system("pause");
         }
         if (usertype == '3') {
-            for (int i = 0; i < studentcount; i++) {
-                if (username == student[i].name) {
+            for (int i = 0; i < adminscount; i++) {
+                if (username == admin_member[i].name) {
                     cout << "*********Sorry this username is already used!*********";
                     break;
                 }
             }
-            studentcount++;
-            student[studentcount - 1].name = username;
-            student[studentcount - 1].password = password;
-            student[studentcount - 1].Student_ID = 1882202611 + studentcount;
+            adminscount++;
+            admin_member[adminscount - 1].name = username;
+            admin_member[adminscount - 1].password = password;
+            admin_member[adminscount - 1].ID = 1882202611 + adminscount;
             cout << "===========Your admin account has created seccessfully===========\n";
-            cout << "Your student ID is: " << student[studentcount - 1].Student_ID;
+            cout << "Your student ID is: " << admin_member[adminscount - 1].ID << endl;
             save();
             return true;
             system("pause");
@@ -595,12 +597,117 @@ void load() {
             cout << "       Admins' Dashboard\n";
             cout << "=================================\n";
             cout << "Press 1 To Add Courses\n";
-            cout << "Press 2 To Put Schedules Of Courses\n";
-            cout << "Press 3 To Put Schedules Of Exams\n";
-            cout << "Press 4 To Logout (Return to Main Menu)\n";
+            cout << "Press 2 To Put Schedule Of Courses\n";
+            cout << "Press 3 To Put Schedule Of Exams\n";
+            cout << "Press 4 To See The Available Courses\n";
+            cout << "Press 5 To See The Schedules Of Courses\n";
+            cout << "Press 6 To See The Schedules Of Exams\n";
+            cout << "Press 7 To Logout (Return to Main Menu)\n";
             cout << "Enter your choice: ";
+            cin >> Admin_choice;
+
+            switch (Admin_choice) {
+            case '1': {
+                string add_choice;
+                do {
+                    cout << "Course name: ";
+                    getline(cin >> ws, course[coursescount].name);
+                    cout << "Course grade: ";
+                    cin >> course[coursescount].grade;
+                    for (int i = 0; i < coursescount; i++) {
+                        if (course[coursescount].name == course[i].name) {
+                            cout << "*****Sorry this course is already existed*****";
+                            break;
+                        }
+                    }
+                    transform(course[coursescount].name.begin(), course[coursescount].name.end(), course[coursescount].name.begin(), ::tolower);
+                    courses_table[schedules_count].course_name = course[coursescount].name;
+                    coursescount++;
+                    schedules_count++;
+                    cout << "Do you want to add another course? (\"yes\" | \"no\") ";
+                     cin >> add_choice;
+                     transform(add_choice.begin(), add_choice.end(), add_choice.begin(), ::tolower);
+                } while (add_choice != "no");
+
+                break;
+            }
+            case '2': {
+                    string set_choice;
+                do{
+                    int course_number_choice;
+                    int course_index;
+                        for (int i = 0; i < coursescount; i++) {
+                            // طباعة رقم الكورس واسمه
+                            cout << i + 1 << ": " << course[i].name << " | ";
+
+                            // لو ترتيب الكورس الحالي بيقبل القسمة على 4 (يعني العمود الرابع)
+                            // ننزل سطر جديد عشان نبدأ صف جديد
+                            if ((i + 1) % 4 == 0) {
+                                cout << endl;
+                            }
+                        }
+                    cout << "Choose the course number: ";
+                    cin >> course_number_choice;
+
+                        // سطر جديد في النهاية عشان لو عدد الكورسات الكلي مش من مضاعفات الـ 4 
+                        // الشكل ميبوظش مع أي نصوص هتنطبع بعد الجدول
+                        cout << endl;
+
+                    course_index = course_number_choice - 1;
+                    cout << "Course week day: ";
+                    getline(cin >> ws,  courses_table[course_index].week_day);
+                    cout << "Course time: ";
+                    cin >> courses_table[course_index].time;
+                    cout << "Do you want to set another course schedule? (\"yes\" | \"no\") ";
+                    cin >> set_choice;
+                    transform(set_choice.begin(), set_choice.end(), set_choice.begin(), ::tolower);
+                } while(set_choice != "no");
+                break;
+            }
+            case '3': {
+                string set_exams_choice;
+
+                do {
+                    int exam_number_choice;
+                    int exam_set_index;
+                    for (int i = 0; i < examscount; i++) {
+                        // طباعة رقم الكورس واسمه
+                        cout << i + 1 << ": " << exam_schedule[i].exam_name << " | ";
+
+                        // لو ترتيب الكورس الحالي بيقبل القسمة على 4 (يعني العمود الرابع)
+                        // ننزل سطر جديد عشان نبدأ صف جديد
+                        if ((i + 1) % 4 == 0) {
+                            cout << endl;
+                        }
+                    }
+                    cout << "Choose the course number to set the exam: ";
+                    cin >> exam_number_choice;
+
+                    // سطر جديد في النهاية عشان لو عدد الكورسات الكلي مش من مضاعفات الـ 4 
+                    // الشكل ميبوظش مع أي نصوص هتنطبع بعد الجدول
+                    cout << endl;
+
+                    exam_set_index = exam_number_choice - 1;
+
+                } while (set_exams_choice != "no");
+
+                break;
+            }
+            case '4': {
 
 
-            switch (Admin_choice)
-        } while (Admin_choice != 4);
+                break;
+            }
+            case '5': {
+
+
+                break;
+            }
+            case '6': {
+
+
+                break;
+            }
+            }
+        }while (Admin_choice != 7);
     }
