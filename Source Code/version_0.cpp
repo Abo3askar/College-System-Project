@@ -4,7 +4,7 @@
 #include<fstream>
 #include<algorithm>
 #include<cctype>
-#include<limits> // <--- تم إضافتها لتنظيف الـ Buffer في الـ Input Validation
+#include<limits>
 
 #define Students_max_users 500
 #define Doctors_max_users 100
@@ -74,8 +74,6 @@ appointments appointment[200];
 int appointment_count(0);
 grades grade[Courses_limit];
 
-
-// Functions Declaration
 bool logincheck(int id, string password, int usertype);
 bool signupcheck(string name, string password, char usertype);
 void studentmenu(int id); 
@@ -84,17 +82,15 @@ void adminsmenu(int id);
 void save();
 void load();
 
-// ================= INPUT VALIDATION FUNCTIONS =================
-// الدالتين دول عشان نحمي السيستم من الـ Crash لو اليوزر دخل حروف بدل الأرقام
 int safeInputInt() {
     int value;
-    cin >> value; // ناخد الإدخال الأول
+    cin >> value; 
 
-    while (cin.fail()) { // لو الإدخال فشل
-        cin.clear(); // شيل الـ Error flag
-        cin.ignore(numeric_limits<streamsize>::max(), '\n'); // امسح الحروف الغلط
+    while (cin.fail()) { 
+        cin.clear(); 
+        cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
         cout << "Invalid input! Please enter a valid number: ";
-        cin >> value; // اطلب الإدخال تاني
+        cin >> value; 
     }
 
     return value;
@@ -103,15 +99,14 @@ int safeInputInt() {
 float safeInputFloat() {
     float value;
     cin >> value;
-        while (cin.fail()) { // لو الإدخال فشل
-            cin.clear(); // شيل الـ Error flag
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); // امسح الحروف الغلط
+        while (cin.fail()) {
+            cin.clear(); 
+            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
             cout << "Invalid input! Please enter a valid number: ";
-            cin >> value; // اطلب الإدخال تاني
+            cin >> value;
     }
     return value;
 }
-// ==============================================================
 
 
 int main() {
@@ -136,7 +131,7 @@ int main() {
             cout << "Sign up as (1: Student, 2: Staff, 3: Admin): ";
             cin >> type;
             cout << "Enter your Full Name: ";
-            getline(cin >> ws, signup_name); // عشان يقبل اسم فيه مسافات (زي Omar Gamal)
+            getline(cin >> ws, signup_name); 
             cout << "Enter new password: ";
             cin >> signup_pass;
 
@@ -460,7 +455,7 @@ void studentmenu(int id) {
             }
             int course_choice;
             cout << "Select course number to register: ";
-            course_choice = safeInputInt(); // باستخدام دالة الحماية
+            course_choice = safeInputInt();
             if (course_choice > 0 && course_choice <= coursescount) {
                 int current_course = student[studentIndex].student_grades_count;
                 if (current_course < 7) {
@@ -649,11 +644,8 @@ void staffmenu(int id) {
                             student[i].student_grade[j].year_work = safeInputFloat();
                             cout << "Final (out of 60): ";
                             student[i].student_grade[j].final = safeInputFloat();
-
-                            // -- حساب الـ GPA الأوتوماتيك --
                             float total = student[i].student_grade[j].quiz + student[i].student_grade[j].practical +
                                 student[i].student_grade[j].year_work + student[i].student_grade[j].final;
-
                             if (total >= 90) { student[i].student_grade[j].gpa_alphabet = "A"; student[i].student_grade[j].gpa = 4.0; }
                             else if (total >= 85) { student[i].student_grade[j].gpa_alphabet = "A-"; student[i].student_grade[j].gpa = 3.7; }
                             else if (total >= 80) { student[i].student_grade[j].gpa_alphabet = "B+"; student[i].student_grade[j].gpa = 3.3; }
@@ -736,21 +728,38 @@ void adminsmenu(int id) {
         case '1': {
             string add_choice;
             do {
-                cout << "Course name: ";
-                getline(cin >> ws, course[coursescount].name);
-                cout << "Course grade: ";
-                course[coursescount].grade = safeInputFloat();
+                string temp_name;
+                float temp_grade;
 
+                cout << "Course name: ";
+                getline(cin >> ws, temp_name);
+                cout << "Course grade: ";
+                temp_grade = safeInputFloat();
+
+                bool exists = false;
                 for (int i = 0; i < coursescount; i++) {
-                    if (course[coursescount].name == course[i].name) {
+                    string existing_course = course[i].name;
+                    string new_course = temp_name;
+                    transform(existing_course.begin(), existing_course.end(), existing_course.begin(), ::tolower);
+                    transform(new_course.begin(), new_course.end(), new_course.begin(), ::tolower);
+
+                    if (new_course == existing_course) {
                         cout << "*****Sorry this course is already existed*****\n";
-                        break;
+                        exists = true;
+                        break; 
                     }
                 }
-                transform(course[coursescount].name.begin(), course[coursescount].name.end(), course[coursescount].name.begin(), ::tolower);
-                courses_table[schedules_count].course_name = course[coursescount].name;
-                coursescount++;
-                schedules_count++;
+                if (!exists) {
+                    course[coursescount].name = temp_name;
+                    course[coursescount].grade = temp_grade;
+                    transform(course[coursescount].name.begin(), course[coursescount].name.end(), course[coursescount].name.begin(), ::tolower);
+                    courses_table[schedules_count].course_name = course[coursescount].name;
+
+                    coursescount++;
+                    schedules_count++;
+                    cout << "Course added successfully!\n";
+                }
+
                 cout << "Do you want to add another course? (\"yes\" | \"no\") ";
                 cin >> add_choice;
                 transform(add_choice.begin(), add_choice.end(), add_choice.begin(), ::tolower);
